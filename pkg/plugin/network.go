@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"net"
 
@@ -179,7 +180,8 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 	} else {
 		h := sha256.Sum256([]byte(r.EndpointID))
 		hostLink.PeerHardwareAddr = net.HardwareAddr(h[:6])
-		log.Warnf("VP>>>>>>> Using hardcoded MAC %s for host %+v", net.HardwareAddr(h[:6]), r)
+		b, _ := json.Marshal(r)
+		log.Warnf("VP>>>>>>> Using hardcoded MAC %s for host %s %+v %+v", net.HardwareAddr(h[:6]), string(b), r, r.Interface)
 	}
 
 	if err := netlink.LinkAdd(hostLink); err != nil {
