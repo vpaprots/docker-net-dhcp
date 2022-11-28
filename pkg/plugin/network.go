@@ -3,6 +3,7 @@ package plugin
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"net"
 
@@ -175,6 +176,10 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		}
 
 		hostLink.PeerHardwareAddr = addr
+	} else {
+		h := sha256.Sum256([]byte(r.EndpointID))
+		hostLink.PeerHardwareAddr = net.HardwareAddr(h[:6])
+		log.Warnf("VP>>>>>>> Using hardcoded MAC %s for host %s", r.EndpointID, net.HardwareAddr(h[:6]))
 	}
 
 	if err := netlink.LinkAdd(hostLink); err != nil {
