@@ -11,7 +11,7 @@ jobs:
 
     env:
       PLUGIN_NAME: ghcr.io/vpaprots/docker-net-dhcp
-      PLATFORMS: linux/amd64,linux/386,linux/arm64,linux/arm/v7
+      PLATFORMS: linux/amd64,linux/arm64  #,linux/386,,linux/arm/v7
 
     steps:
       - uses: actions/checkout@v2

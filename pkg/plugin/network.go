@@ -9,6 +9,7 @@ import (
 	"net"
 
 	dTypes "github.com/docker/docker/api/types"
+	dFilters "github.com/docker/docker/api/types/filters"
 	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 	"github.com/vishvananda/netlink"
@@ -178,15 +179,20 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 
 		hostLink.PeerHardwareAddr = addr
 	} else {
-		inspectJson, err := p.docker.ContainerInspect(ctx, r.EndpointID)
+		search := dTypes.ContainerListOptions{
+			//Filters: dFilters.NewArgs(),
+		}
+		//search.Filters.Add("endpoindid", r.EndpointID)
+		_ = dFilters.NewArgs()
+		list, err := p.docker.ContainerList(ctx, search)
 		if err != nil {
 			log.Warnf("VP>>>>>>> ERROR trying to get HOSTNAME: %s (%+v %+v)", err, r, r.Interface)
 		}
 
-		h := sha256.Sum256([]byte(inspectJson.Config.Hostname))
+		b, _ := json.Marshal(list)
+		h := sha256.Sum256([]byte(r.EndpointID))
 		hostLink.PeerHardwareAddr = net.HardwareAddr(h[:6])
-		b, _ := json.Marshal(r)
-		log.Warnf("VP>>>>>>> Using hardcoded MAC %s for host %s %+v %+v", net.HardwareAddr(h[:6]), string(b), r, inspectJson)
+		log.Warnf("VP>>>>>>> Using hardcoded MAC %s for host %s %+v", net.HardwareAddr(h[:6]), string(b), r)
 	}
 
 	if err := netlink.LinkAdd(hostLink); err != nil {
