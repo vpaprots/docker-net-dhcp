@@ -178,10 +178,15 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 
 		hostLink.PeerHardwareAddr = addr
 	} else {
-		h := sha256.Sum256([]byte(r.EndpointID))
+		inspectJson, err := p.docker.ContainerInspect(ctx, r.EndpointID)
+		if err != nil {
+			log.Warnf("VP>>>>>>> ERROR trying to get HOSTNAME: %s (%+v %+v)", err, r, r.Interface)
+		}
+
+		h := sha256.Sum256([]byte(inspectJson.Config.Hostname))
 		hostLink.PeerHardwareAddr = net.HardwareAddr(h[:6])
 		b, _ := json.Marshal(r)
-		log.Warnf("VP>>>>>>> Using hardcoded MAC %s for host %s %+v %+v", net.HardwareAddr(h[:6]), string(b), r, r.Interface)
+		log.Warnf("VP>>>>>>> Using hardcoded MAC %s for host %s %+v %+v", net.HardwareAddr(h[:6]), string(b), r, inspectJson)
 	}
 
 	if err := netlink.LinkAdd(hostLink); err != nil {
