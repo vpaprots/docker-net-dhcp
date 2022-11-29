@@ -170,16 +170,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		PeerName:  ctrName,
 	}
 
-	if r.Options != nil {
-		if idI, ok := r.Options["id"]; ok {
-			if id, ok := idI.([]byte); ok {
-				h := sha256.Sum256(id)
-				mac := net.HardwareAddr(h[:6])
-				hostLink.PeerHardwareAddr = mac
-				log.Infof("Using MAC %s for host %s", mac, id)
-			}
-		}
-	}
+	log.Infof("VP>>>>>> Options %+v", r)
 
 	if r.Interface.MacAddress != "" {
 		addr, err := net.ParseMAC(r.Interface.MacAddress)
@@ -188,6 +179,15 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		}
 
 		hostLink.PeerHardwareAddr = addr
+	} else if r.Options != nil {
+		if idI, ok := r.Options["id"]; ok {
+			if id, ok := idI.(string); ok {
+				h := sha256.Sum256([]byte(id))
+				mac := net.HardwareAddr(h[:6])
+				hostLink.PeerHardwareAddr = mac
+				log.Infof("Using MAC %s for host %s", mac, id)
+			}
+		}
 	}
 
 	if err := netlink.LinkAdd(hostLink); err != nil {
