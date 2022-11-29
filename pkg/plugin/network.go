@@ -303,7 +303,6 @@ func (p *Plugin) EndpointOperInfo(ctx context.Context, r InfoRequest) (InfoRespo
 	}
 
 	hostName, _ := vethPairNames(r.EndpointID)
-	log.Infof("VP>>>>>> EndpointOperInfo Options %+v", r.Options)
 	hostLink, err := netlink.LinkByName(hostName)
 	if err != nil {
 		return res, fmt.Errorf("failed to find host side of veth pair: %w", err)
@@ -324,7 +323,6 @@ func (p *Plugin) EndpointOperInfo(ctx context.Context, r InfoRequest) (InfoRespo
 // DeleteEndpoint deletes the veth pair
 func (p *Plugin) DeleteEndpoint(r DeleteEndpointRequest) error {
 	hostName, _ := vethPairNames(r.EndpointID)
-	log.Infof("VP>>>>>> DeleteEndpoint Options %+v", r.Options)
 	link, err := netlink.LinkByName(hostName)
 	if err != nil {
 		return fmt.Errorf("failed to lookup host veth interface %v: %w", hostName, err)
@@ -437,7 +435,6 @@ func (p *Plugin) Join(ctx context.Context, r JoinRequest) (JoinResponse, error) 
 	}
 
 	_, ctrName := vethPairNames(r.EndpointID)
-	log.Infof("VP>>>>>> Join Options %+v", r.Options)
 
 	res.InterfaceName = InterfaceName{
 		SrcName:   ctrName,
