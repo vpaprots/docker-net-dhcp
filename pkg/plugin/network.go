@@ -170,7 +170,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		PeerName:  ctrName,
 	}
 
-	log.Infof("VP>>>>>> Options %+v", r)
+	log.Infof("VP>>>>>> CreateEndpoint Options %+v", r.Options)
 
 	if r.Interface.MacAddress != "" {
 		addr, err := net.ParseMAC(r.Interface.MacAddress)
@@ -183,6 +183,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		if idI, ok := r.Options["id"]; ok {
 			if id, ok := idI.(string); ok {
 				h := sha256.Sum256([]byte(id))
+				h[0] = 2 //
 				mac := net.HardwareAddr(h[:6])
 				hostLink.PeerHardwareAddr = mac
 				log.Infof("Using MAC %s for host %s", mac, id)
@@ -302,6 +303,7 @@ func (p *Plugin) EndpointOperInfo(ctx context.Context, r InfoRequest) (InfoRespo
 	}
 
 	hostName, _ := vethPairNames(r.EndpointID)
+	log.Infof("VP>>>>>> EndpointOperInfo Options %+v", r.Options)
 	hostLink, err := netlink.LinkByName(hostName)
 	if err != nil {
 		return res, fmt.Errorf("failed to find host side of veth pair: %w", err)
@@ -322,6 +324,7 @@ func (p *Plugin) EndpointOperInfo(ctx context.Context, r InfoRequest) (InfoRespo
 // DeleteEndpoint deletes the veth pair
 func (p *Plugin) DeleteEndpoint(r DeleteEndpointRequest) error {
 	hostName, _ := vethPairNames(r.EndpointID)
+	log.Infof("VP>>>>>> DeleteEndpoint Options %+v", r.Options)
 	link, err := netlink.LinkByName(hostName)
 	if err != nil {
 		return fmt.Errorf("failed to lookup host veth interface %v: %w", hostName, err)
@@ -434,6 +437,7 @@ func (p *Plugin) Join(ctx context.Context, r JoinRequest) (JoinResponse, error) 
 	}
 
 	_, ctrName := vethPairNames(r.EndpointID)
+	log.Infof("VP>>>>>> Join Options %+v", r.Options)
 
 	res.InterfaceName = InterfaceName{
 		SrcName:   ctrName,
