@@ -183,7 +183,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		if idI, ok := r.Options["id"]; ok {
 			if id, ok := idI.(string); ok {
 				h := sha256.Sum256([]byte(id))
-				h[0] = 2 //
+				h[0] = 48 //
 				mac := net.HardwareAddr(h[:6])
 				hostLink.PeerHardwareAddr = mac
 				log.Infof("Using MAC %s for host %s", mac, id)
