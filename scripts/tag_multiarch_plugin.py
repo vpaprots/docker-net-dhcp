@@ -30,9 +30,9 @@ def main():
         print(f'Re-tagging {without_tag}:{p.tag(old_tag)} as {without_tag}:{p.tag(new_tag)}')
         reg.set_manifest(p.tag(new_tag), mf, mime=MTYPE_MANIFEST)
 
-    print(f'Re-tagging {args.image} as {without_tag}:{new_tag}')
-    mf = reg.get_manifest(old_tag)
-    reg.set_manifest(new_tag, mf, mime=MTYPE_MANIFEST_LIST)
+    # print(f'Re-tagging {args.image} as {without_tag}:{new_tag}')
+    # mf = reg.get_manifest(old_tag)
+    # reg.set_manifest(new_tag, mf, mime=MTYPE_MANIFEST_LIST)
 
 if __name__ == '__main__':
     main()
