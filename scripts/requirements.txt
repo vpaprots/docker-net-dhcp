@@ -1,1 +1,2 @@
+python-dxf==11.1.1
 docker-image-py>0.1,<0.2
