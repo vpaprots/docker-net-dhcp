@@ -143,6 +143,8 @@ func (p *Plugin) netOptions(ctx context.Context, id string) (DHCPNetworkOptions,
 // move the interface into the container's namespace and apply the address.
 func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (CreateEndpointResponse, error) {
 	log.WithField("options", r.Options).Debug("CreateEndpoint options")
+	ctx, cancel := context.WithTimeout(ctx, time.Second*60)
+	defer cancel()
 	res := CreateEndpointResponse{
 		Interface: &EndpointInterface{},
 	}
@@ -157,10 +159,14 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		return res, fmt.Errorf("failed to get network options: %w", err)
 	}
 
+	log.Debugf("VP>>>>>> CreateEndpoint 1")
+
 	bridge, err := netlink.LinkByName(opts.Bridge)
 	if err != nil {
 		return res, fmt.Errorf("failed to get bridge interface: %w", err)
 	}
+
+	log.Debugf("VP>>>>>> CreateEndpoint 2")
 
 	hostName, ctrName := vethPairNames(r.EndpointID)
 	la := netlink.NewLinkAttrs()
@@ -170,7 +176,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		PeerName:  ctrName,
 	}
 
-	log.Infof("VP>>>>>> CreateEndpoint Options %+v", r.Options)
+	log.Debugf("VP>>>>>> CreateEndpoint Options %+v", r.Options)
 
 	if r.Interface.MacAddress != "" {
 		addr, err := net.ParseMAC(r.Interface.MacAddress)
