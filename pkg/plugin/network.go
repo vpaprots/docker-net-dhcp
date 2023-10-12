@@ -157,7 +157,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 	var opts DHCPNetworkOptions
 	var err error
 	backoff := 2 * time.Second
-	retries := 8
+	retries := 2
 	for retries >= 0 {
 		opts, err = p.netOptions(ctx, r.NetworkID)
 		if err == nil {
