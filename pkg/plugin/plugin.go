@@ -78,7 +78,7 @@ type Plugin struct {
 func NewPlugin(awaitTimeout time.Duration) (*Plugin, error) {
 	client, err := docker.NewClientWithOpts(
 		docker.WithHost("unix:///run/docker.sock"),
-		docker.WithVersion("v1.13.1"),
+		docker.WithVersion("v1.24"),
 		docker.WithTimeout(awaitTimeout)) // If local Docker doesn't respond in under 2s, it's probably not ready.
 	if err != nil {
 		return nil, fmt.Errorf("failed to create docker client: %w", err)
