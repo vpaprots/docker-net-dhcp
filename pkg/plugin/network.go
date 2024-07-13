@@ -145,6 +145,7 @@ func (p *Plugin) netOptions(ctx context.Context, id string) (DHCPNetworkOptions,
 func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (CreateEndpointResponse, error) {
 	log.WithField("options", r.Options).Debug("CreateEndpoint options")
 	log.Debugf("VP>>>>>> CreateEndpoint Request %+v", r)
+	log.Debugf("VP>>>>>> CreateEndpoint Request Interface %+v", r.Interface)
 	ctx, cancel := context.WithTimeout(ctx, p.awaitTimeout)
 	defer cancel()
 	res := CreateEndpointResponse{
