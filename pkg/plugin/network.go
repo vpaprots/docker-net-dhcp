@@ -144,6 +144,7 @@ func (p *Plugin) netOptions(ctx context.Context, id string) (DHCPNetworkOptions,
 // move the interface into the container's namespace and apply the address.
 func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (CreateEndpointResponse, error) {
 	log.WithField("options", r.Options).Debug("CreateEndpoint options")
+	log.Debugf("VP>>>>>> CreateEndpoint Request %+v", r)
 	ctx, cancel := context.WithTimeout(ctx, p.awaitTimeout)
 	defer cancel()
 	res := CreateEndpointResponse{
@@ -188,7 +189,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		PeerName:  ctrName,
 	}
 
-	log.Debugf("VP>>>>>> CreateEndpoint Options %+v", r.Options)
+	log.Debugf("VP>>>>>> CreateEndpoint 3")
 
 	if r.Interface.MacAddress != "" {
 		addr, err := net.ParseMAC(r.Interface.MacAddress)
