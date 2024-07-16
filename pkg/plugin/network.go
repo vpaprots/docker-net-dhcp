@@ -3,7 +3,6 @@ package plugin
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
 	"fmt"
 	"net"
 	"time"
@@ -199,16 +198,6 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		}
 
 		hostLink.PeerHardwareAddr = addr
-	} else if r.Options != nil {
-		if idI, ok := r.Options["id"]; ok {
-			if id, ok := idI.(string); ok {
-				h := sha256.Sum256([]byte(id))
-				h[0] = 48 //
-				mac := net.HardwareAddr(h[:6])
-				hostLink.PeerHardwareAddr = mac
-				log.Infof("Using MAC %s for host %s", mac, id)
-			}
-		}
 	}
 
 	if err := netlink.LinkAdd(hostLink); err != nil {
@@ -255,7 +244,17 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 			timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 			defer cancel()
 
-			info, err := udhcpc.GetIP(timeoutCtx, ctrName, &udhcpc.DHCPClientOptions{V6: v6})
+			hostname := ""
+			if r.Options != nil {
+				if idI, ok := r.Options["hostname"]; ok {
+					hostname, _ = idI.(string)
+				}
+			}
+
+			info, err := udhcpc.GetIP(timeoutCtx, ctrName, &udhcpc.DHCPClientOptions{
+				V6:       v6,
+				Hostname: hostname,
+			})
 			if err != nil {
 				return fmt.Errorf("failed to get initial IP%v address via DHCP%v: %w", v6str, v6str, err)
 			}
@@ -302,6 +301,7 @@ func (p *Plugin) CreateEndpoint(ctx context.Context, r CreateEndpointRequest) (C
 		"ip":          res.Interface.Address,
 		"ipv6":        res.Interface.AddressIPv6,
 		"gateway":     fmt.Sprintf("%#v", p.joinHints[r.EndpointID].Gateway),
+		"hostname":    hostName,
 	}).Info("Endpoint created")
 
 	return res, nil
