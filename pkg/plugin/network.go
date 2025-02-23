@@ -131,6 +131,13 @@ func (p *Plugin) netOptions(ctx context.Context, id string) (DHCPNetworkOptions,
 		return dummy, fmt.Errorf("failed to get info from Docker: %w", err)
 	}
 
+	log.Debugf("VP>>>>>> CreateEndpoint netOptions %+v", n)
+	log.Debugf("VP>>>>>> CreateEndpoint netOptions Options %+v", n.Options)
+	log.Debugf("VP>>>>>> CreateEndpoint netOptions Containers %+v", n.Containers)
+	log.Debugf("VP>>>>>> CreateEndpoint netOptions Labels %+v", n.Labels)
+	log.Debugf("VP>>>>>> CreateEndpoint netOptions Services %+v", n.Services)
+	log.Debugf("VP>>>>>> CreateEndpoint netOptions Peers %+v", n.Peers)
+
 	opts, err := decodeOpts(n.Options)
 	if err != nil {
 		return dummy, fmt.Errorf("failed to parse options: %w", err)
